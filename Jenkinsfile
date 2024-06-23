@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'sam build'
-                sh 'sam deploy --config-env staging'
+                sh 'sam deploy --config-env --parameter-overrides staging Stage=staging'
             }
         }
         stage('Get Stack URL') {
