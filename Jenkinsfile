@@ -35,7 +35,7 @@ environment {
            steps {
                 script {
                     export BASE_URL=${STACK_URL}
-                    pytest --junitxml=result.rest.xml test\integration\todoApiTest.py
+                    pytest --junitxml=result.rest.xml \test\integration\todoApiTest.py
                 }
                 junit 'result*.xml'
             }
