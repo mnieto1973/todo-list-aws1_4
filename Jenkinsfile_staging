@@ -42,9 +42,9 @@ environment {
         }
         stage('Promote') {
             steps {
-                sh 'git checkout master'
-                sh 'git merge develop'
-                sh 'git push origin master'
+                git checkout master
+                git merge develop
+                git push origin master
             }
         }
     }
