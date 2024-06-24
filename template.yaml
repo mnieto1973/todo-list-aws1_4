@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  todo-list-aws
+  todo-list-aws-1-4
 
   Application TODO-LIST with SAM format
 
@@ -96,7 +96,7 @@ Resources:
   TodosDynamoDbTable:
     Type: AWS::DynamoDB::Table
     Properties: 
-      TableName: !Sub "${Stage}-TodosDynamoDbTable"
+      TableName: !Sub "${Stage}-TodosDynamoDbTable2"
       AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
