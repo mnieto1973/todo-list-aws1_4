@@ -34,7 +34,7 @@ environment {
          stage('Test') {
            steps {
                 script {
-                    export BASE_URL=${STACK_URL}
+                    sh "export BASE_URL=${STACK_URL}"
                     sh 'pytest --junitxml=result.rest.xml test/integration/todoApiTest.py'
                 }
                 junit 'result*.xml'
