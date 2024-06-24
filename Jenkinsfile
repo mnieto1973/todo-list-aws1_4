@@ -26,15 +26,15 @@ environment {
             steps {
                 script {
                     def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
-                    env.STACK_URL = url
-                    echo "Stack URL: ${STACK_URL}"
+                    env.BASE_URL = url
+                    echo "Stack URL: ${BASE_URL}"
                 }
             }
         }
          stage('Test') {
            steps {
                 script {
-                    sh "export BASE_URL=${STACK_URL}"
+                    sh "export BASE_URL=${BASE_URL}"
                     sh 'pytest --junitxml=result.rest.xml test/integration/todoApiTest.py'
                 }
                 junit 'result*.xml'
