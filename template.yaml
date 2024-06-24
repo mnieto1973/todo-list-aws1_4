@@ -22,7 +22,7 @@ Globals:
     Timeout: 3
     Environment:
       Variables:
-        DYNAMODB_TABLE: !Ref TodosDynamoDbTable
+        DYNAMODB_TABLE: !Ref TodosDynamoDbTable2
         ENDPOINT_OVERRIDE: ""
     
 Resources:
@@ -96,7 +96,7 @@ Resources:
   TodosDynamoDbTable:
     Type: AWS::DynamoDB::Table
     Properties: 
-      TableName: !Sub "${Stage}-TodosDynamoDbTable"
+      TableName: !Sub "${Stage}-TodosDynamoDbTable2"
       AttributeDefinitions: 
         - AttributeName: id
           AttributeType: S
