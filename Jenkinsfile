@@ -31,5 +31,13 @@ environment {
                 }
             }
         }
+         stage('Test') {
+           steps {
+                script {
+                    export BASE_URL=${STACK_URL}
+                    pytest test/integration/todoApiTest.py
+                }
+            }
+        }
     }
 }
