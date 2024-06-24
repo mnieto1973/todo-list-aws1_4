@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'sam build'
-                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --disable-rollback'
+                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
             }
         }
         stage('Get Stack URL') {
