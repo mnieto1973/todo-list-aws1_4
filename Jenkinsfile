@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+environment {
+        STACK_NAME = 'todo-list-aws-1-4'
+    }
     stages {
         stage('Get Code') {
             steps {
