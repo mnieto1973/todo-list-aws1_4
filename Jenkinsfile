@@ -25,7 +25,7 @@ environment {
         stage('Get Stack URL') {
             steps {
                 script {
-                    def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='ApiBaseUrl'].OutputValue\" --output text", returnStdout: true).trim()
+                    def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
                     env.STACK_URL = url
                     echo "Stack URL: ${STACK_URL}"
                 }
