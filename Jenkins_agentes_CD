@@ -9,6 +9,8 @@ environment {
              agent { label 'default' }
             steps {
                 git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+                  sh 'whoami'
+                 sh 'hostname'
             }
         }
         stage('Static Test') {
@@ -16,6 +18,8 @@ environment {
             steps {
                 sh 'flake8 src/ > flake8-report.txt'
                 sh 'bandit -r src/ > bandit-report.txt'
+                  sh 'whoami'
+                 sh 'hostname'
                 archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
             }
         }
@@ -23,7 +27,9 @@ environment {
                 agent { label 'default' }
             steps {
                 sh 'sam build'
-                sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM'
+                sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset'
+                  sh 'whoami'
+                 sh 'hostname'
             }
         }
         stage('Get Stack URL') {
@@ -33,6 +39,8 @@ environment {
                     def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
                     env.BASE_URL = url
                     echo "Stack URL: ${BASE_URL}"
+                      sh 'whoami'
+                 sh 'hostname'
                 }
             }
         }
@@ -42,6 +50,8 @@ environment {
                 script {
                     sh "export BASE_URL=${BASE_URL}"
                     sh 'pytest -m testProduccion --junitxml=result.rest.xml   test/integration/todoApiTest.py'
+                      sh 'whoami'
+                 sh 'hostname'
                 }
                 junit 'result*.xml'
             }
