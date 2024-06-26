@@ -27,7 +27,7 @@ environment {
              agent { label 'default' }
             steps {
                 sh 'sam build'
-                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
+                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM --no-fail-empty-changeset'
                  sh 'whoami'
                 sh 'hostname'
             }
