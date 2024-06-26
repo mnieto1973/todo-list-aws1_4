@@ -39,8 +39,8 @@ environment {
                     def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
                     env.BASE_URL = url
                     echo "Stack URL: ${BASE_URL}"
-                    whoami
-                    hostname
+                    sh 'whoami'
+                    sh 'hostname'
                 }
             }
         }
