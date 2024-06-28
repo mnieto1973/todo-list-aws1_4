@@ -29,7 +29,7 @@ pipeline {
             steps {
                 // Construir y desplegar usando el archivo de configuración descargado
                 sh 'sam build'
-                sh 'sam deploy --config-env staging --config-file samconfig-staging.toml --parameter-overrides --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset'
+                sh 'sam deploy --config-env staging --config-file samconfig-staging.toml  --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset'
             }
         }
         stage('Get Stack URL') {
