@@ -4,7 +4,7 @@ pipeline {
     environment {
         STACK_NAME = 'todo-list-aws-1-4-staging'
         GIT_CREDENTIALS_ID = 'gitunir' // ID de las credenciales de Git configuradas en Jenkins
-        CONFIG_REPO = 'https://github.com/tu-repositorio/todo-list-aws-config.git'
+        CONFIG_REPO_URL = 'https://raw.githubusercontent.com/mnieto1973/todo-list-aws1_4_config/staging/samconfig.toml'
     }
 
     stages {
@@ -12,8 +12,8 @@ pipeline {
             steps {
                 // Clonar el repositorio principal en la rama 'develop'
                 git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
-                // Clonar el repositorio de configuración en la rama 'staging'
-                sh 'git clone -b staging ${CONFIG_REPO} config'
+                // Descargar el archivo de configuración samconfig.toml desde la rama 'staging'
+                sh 'curl -o samconfig-staging.toml ${CONFIG_REPO_URL}'
             }
         }
         stage('Static Test') {
@@ -27,9 +27,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                // Construir y desplegar usando el archivo de configuración específico en el repositorio de configuración
+                // Construir y desplegar usando el archivo de configuración descargado
                 sh 'sam build'
-                sh 'sam deploy --config-env staging --config-file config/samconfig.toml --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset'
+                sh 'sam deploy --config-env staging --config-file samconfig-staging.toml --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
             }
         }
         stage('Get Stack URL') {
