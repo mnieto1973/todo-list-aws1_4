@@ -10,15 +10,15 @@ pipeline {
         stage('Determine Branch') {
             steps {
                 script {
-                    branchName = env.BRANCH_NAME
+                    def branchName = env.BRANCH_NAME
                     echo "Branch name: ${branchName}"
                     
                     if (branchName == "develop") {
                         echo "Running develop pipeline"
-                        runPipeline("develop")
+                        runDevelopPipeline()
                     } else if (branchName == "master") {
                         echo "Running master pipeline"
-                        runPipeline("master")
+                        runMasterPipeline()
                     } else {
                         error "No pipeline defined for branch ${branchName}"
                     }
@@ -28,29 +28,14 @@ pipeline {
     }
 
     post {
-        cleanup {
+        always {
             // Limpiar las credenciales guardadas en ~/.git-credentials
             sh 'rm -f ~/.git-credentials'
         }
     }
 }
 
-// Función para ejecutar el pipeline dinámicamente según la rama
-def runPipeline(String branchName) {
-    if (branchName == "develop") {
-        environment {
-            STACK_NAME = 'todo-list-aws-1-4-staging'
-        }
-        runDevelopPipeline()
-    } else if (branchName == "master") {
-        environment {
-            STACK_NAME = 'todo-list-aws-1-4-production'
-        }
-        runMasterPipeline()
-    }
-}
-
-// Definición de pasos para la rama develop
+// Función para ejecutar el pipeline de develop
 def runDevelopPipeline() {
     stage('Get Code') {
         steps {
@@ -103,7 +88,7 @@ def runDevelopPipeline() {
     }
 }
 
-// Definición de pasos para la rama master
+// Función para ejecutar el pipeline de master
 def runMasterPipeline() {
     stage('Get Code') {
         steps {
