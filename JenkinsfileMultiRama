@@ -11,7 +11,7 @@ pipeline {
                     // Definir el nombre del Jenkinsfile específico basado en la rama
                     def jenkinsFilePath = ""
                     if (branchName == "develop") {
-                        jenkinsFilePath = "JenkinsfileCdMulti"
+                        jenkinsFilePath = "JenkinsfileCd"
                     } else if (branchName == "master") {
                         jenkinsFilePath = "JenkinsfileProductionSeparado"
                     } else {
@@ -19,6 +19,7 @@ pipeline {
                     }
 
                     // Imprimir el contenido del workspace para depuración
+                    echo "Workspace content:"
                     sh 'ls -l'
 
                     // Verificar si el Jenkinsfile específico existe en el sistema de archivos
@@ -28,6 +29,7 @@ pipeline {
 
                     // Cargar y ejecutar el Jenkinsfile específico de la rama
                     def branchSpecificScript = load jenkinsFilePath
+                    echo "Loaded ${jenkinsFilePath}"
                     branchSpecificScript.runPipeline()
                 }
             }
