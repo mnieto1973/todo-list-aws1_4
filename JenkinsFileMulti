@@ -8,12 +8,15 @@ environment {
     stages {
         stage('Get Code') {
             steps {
-                if ( env.BRANCH_NAME=='develop'){
-                    git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+                script{
+                    if ( env.BRANCH_NAME=='develop'){
+                        git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+                    }
+                    else if (env.BRANCH_NAME=='master'){
+                        git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+                    }
                 }
-                else if (env.BRANCH_NAME=='master'){
-                    git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
-                }
+               
                
             }
         }
