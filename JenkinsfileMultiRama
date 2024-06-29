@@ -11,15 +11,18 @@ pipeline {
                     // Definir el nombre del Jenkinsfile específico basado en la rama
                     def jenkinsFilePath = ""
                     if (branchName == "develop") {
-                        jenkinsFilePath = "JenkinsfileCd"
+                        jenkinsFilePath = "Jenkinsfile_staging"
                     } else if (branchName == "master") {
-                        jenkinsFilePath = "JenkinsfileProductionSeparado"
+                         jenkinsFilePath = "JenkinsfileCd"
                     } else {
                         error "No Jenkinsfile defined for branch ${branchName}"
                     }
 
                     // Ejecutar dentro de un nodo para asegurar acceso al workspace
                     node {
+                        // Actualizar el repositorio para asegurarse de tener la última versión del código
+                        checkout scm
+
                         // Verificar si el Jenkinsfile específico existe en el sistema de archivos
                         if (!fileExists(jenkinsFilePath)) {
                             error "The specified Jenkinsfile (${jenkinsFilePath}) does not exist in branch ${branchName}"
@@ -33,4 +36,5 @@ pipeline {
         }
     }
 }
+
 
