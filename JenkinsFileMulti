@@ -66,22 +66,22 @@ environment {
                 junit 'result*.xml'
             }
         }
-        stage('Promote') {
+         stage('Promote') {
+            when {
+                expression { env.BRANCH_NAME == 'develop' }
+            }
             steps {
                 script {
-                     if ( env.BRANCH_NAME=='develop'){
- withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    sh '''
-                        git config --global credential.helper store
-                        echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@$(git config --get remote.origin.url | cut -d/ -f3-)" > ~/.git-credentials
-                        git checkout master
-			            git merge develop
-			            git push origin master
-                    '''
+                    withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh '''
+                            git config --global credential.helper store
+                            echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@$(git config --get remote.origin.url | cut -d/ -f3-)" > ~/.git-credentials
+                            git checkout master
+                            git merge develop
+                            git push origin master
+                        '''
+                    }
                 }
-                }
-                }
-               
             }
         }
     }
