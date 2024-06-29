@@ -1,5 +1,5 @@
 def runPipeline() {
-pipeline {
+
     agent { label 'default' }
 environment {
         STACK_NAME = 'todo-list-aws-1-4-production'
@@ -50,6 +50,6 @@ environment {
             sh 'rm -f ~/.git-credentials'
         }
     }
-}
+
 }
 return this
