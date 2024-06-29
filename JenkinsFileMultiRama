@@ -35,11 +35,11 @@ pipeline {
     }
 }
 
-// Función para ejecutar el pipeline de develop
+// Pipeline para la rama 'develop'
 def runDevelopPipeline() {
     stage('Get Code') {
         steps {
-            git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            checkout([$class: 'GitSCM', branches: [[name: 'develop']], userRemoteConfigs: [[url: 'https://github.com/mnieto1973/todo-list-aws1_4.git']]])
         }
     }
     stage('Static Test') {
@@ -88,11 +88,11 @@ def runDevelopPipeline() {
     }
 }
 
-// Función para ejecutar el pipeline de master
+// Pipeline para la rama 'master'
 def runMasterPipeline() {
     stage('Get Code') {
         steps {
-            git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            checkout([$class: 'GitSCM', branches: [[name: 'master']], userRemoteConfigs: [[url: 'https://github.com/mnieto1973/todo-list-aws1_4.git']]])
         }
     }
     stage('Static Test') {
