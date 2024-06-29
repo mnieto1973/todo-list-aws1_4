@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'default' }
 environment {
         STACK_NAME = 'todo-list-aws-1-4-production'
          GIT_CREDENTIALS_ID = 'gitunir' // ID de las credenciales de Git configuradas en Jenkins
