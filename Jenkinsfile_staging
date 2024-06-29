@@ -57,7 +57,7 @@ environment {
     }
      post {
         cleanup {
-            // Limpiar las credenciales guardadas en ~/.git-credentials
+            // Limpiar las credenciales guardadas en ~/.git-credentials.
             sh 'rm -f ~/.git-credentials'
         }
     }
