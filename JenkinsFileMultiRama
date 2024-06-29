@@ -15,10 +15,14 @@ pipeline {
                     
                     if (branchName == 'develop') {
                         echo "Running develop pipeline"
-                        runDevelopPipeline()
+                        script {
+                            runDevelopPipeline()
+                        }
                     } else if (branchName == 'master') {
                         echo "Running master pipeline"
-                        runMasterPipeline()
+                        script {
+                            runMasterPipeline()
+                        }
                     } else {
                         error "No pipeline defined for branch ${branchName}"
                     }
@@ -38,20 +42,26 @@ pipeline {
 def runDevelopPipeline() {
     stage('Get Code') {
         steps {
-            git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            script {
+                git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            }
         }
     }
     stage('Static Test') {
         steps {
-            sh 'flake8 src/ > flake8-report.txt'
-            sh 'bandit -r src/ > bandit-report.txt'
-            archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            script {
+                sh 'flake8 src/ > flake8-report.txt'
+                sh 'bandit -r src/ > bandit-report.txt'
+                archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            }
         }
     }
     stage('Deploy') {
         steps {
-            sh 'sam build'
-            sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
+            script {
+                sh 'sam build'
+                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
+            }
         }
     }
     stage('Get Stack URL') {
@@ -95,20 +105,26 @@ def runMasterPipeline() {
     }
     stage('Get Code') {
         steps {
-            git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            script {
+                git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            }
         }
     }
     stage('Static Test') {
         steps {
-            sh 'flake8 src/ > flake8-report.txt'
-            sh 'bandit -r src/ > bandit-report.txt'
-            archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            script {
+                sh 'flake8 src/ > flake8-report.txt'
+                sh 'bandit -r src/ > bandit-report.txt'
+                archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            }
         }
     }
     stage('Deploy') {
         steps {
-            sh 'sam build'
-            sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM'
+            script {
+                sh 'sam build'
+                sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM'
+            }
         }
     }
     stage('Get Stack URL') {
