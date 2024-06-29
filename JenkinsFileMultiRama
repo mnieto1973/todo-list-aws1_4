@@ -10,15 +10,19 @@ pipeline {
         stage('Determine Branch') {
             steps {
                 script {
-                    branchName = env.BRANCH_NAME
+                    def branchName = env.BRANCH_NAME
                     echo "Branch name: ${branchName}"
                     
-                    if (branchName == "develop") {
+                    if (branchName == 'develop') {
                         echo "Running develop pipeline"
-                        runDevelopPipeline()
-                    } else if (branchName == "master") {
+                        script {
+                            runDevelopPipeline()
+                        }
+                    } else if (branchName == 'master') {
                         echo "Running master pipeline"
-                        runMasterPipeline()
+                        script {
+                            runMasterPipeline()
+                        }
                     } else {
                         error "No pipeline defined for branch ${branchName}"
                     }
@@ -28,7 +32,7 @@ pipeline {
     }
 
     post {
-        cleanup {
+        always {
             // Limpiar las credenciales guardadas en ~/.git-credentials
             sh 'rm -f ~/.git-credentials'
         }
@@ -38,35 +42,41 @@ pipeline {
 def runDevelopPipeline() {
     stage('Get Code') {
         steps {
-            git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            script {
+                git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            }
         }
     }
     stage('Static Test') {
         steps {
-            sh 'flake8 src/ > flake8-report.txt'
-            sh 'bandit -r src/ > bandit-report.txt'
-            archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            script {
+                sh 'flake8 src/ > flake8-report.txt'
+                sh 'bandit -r src/ > bandit-report.txt'
+                archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            }
         }
     }
     stage('Deploy') {
         steps {
-            sh 'sam build'
-            sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
+            script {
+                sh 'sam build'
+                sh 'sam deploy --config-env staging --parameter-overrides Stage=staging --capabilities CAPABILITY_NAMED_IAM'
+            }
         }
     }
     stage('Get Stack URL') {
         steps {
             script {
-                def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
+                def url = sh(script: "aws cloudformation describe-stacks --stack-name ${env.STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' --output text", returnStdout: true).trim()
                 env.BASE_URL = url
-                echo "Stack URL: ${BASE_URL}"
+                echo "Stack URL: ${env.BASE_URL}"
             }
         }
     }
     stage('Test') {
         steps {
             script {
-                sh "export BASE_URL=${BASE_URL}"
+                sh "export BASE_URL=${env.BASE_URL}"
                 sh 'pytest --junitxml=result.rest.xml test/integration/todoApiTest.py'
             }
             junit 'result*.xml'
@@ -74,14 +84,16 @@ def runDevelopPipeline() {
     }
     stage('Promote') {
         steps {
-            withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                sh '''
-                    git config --global credential.helper store
-                    echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@$(git config --get remote.origin.url | cut -d/ -f3-)" > ~/.git-credentials
-                    git checkout master
-                    git merge develop
-                    git push origin master
-                '''
+            script {
+                withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh '''
+                        git config --global credential.helper store
+                        echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@$(git config --get remote.origin.url | cut -d/ -f3-)" > ~/.git-credentials
+                        git checkout master
+                        git merge develop
+                        git push origin master
+                    '''
+                }
             }
         }
     }
@@ -93,35 +105,41 @@ def runMasterPipeline() {
     }
     stage('Get Code') {
         steps {
-            git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            script {
+                git branch: 'master', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+            }
         }
     }
     stage('Static Test') {
         steps {
-            sh 'flake8 src/ > flake8-report.txt'
-            sh 'bandit -r src/ > bandit-report.txt'
-            archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            script {
+                sh 'flake8 src/ > flake8-report.txt'
+                sh 'bandit -r src/ > bandit-report.txt'
+                archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            }
         }
     }
     stage('Deploy') {
         steps {
-            sh 'sam build'
-            sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM'
+            script {
+                sh 'sam build'
+                sh 'sam deploy --config-env production --parameter-overrides Stage=production --capabilities CAPABILITY_NAMED_IAM'
+            }
         }
     }
     stage('Get Stack URL') {
         steps {
             script {
-                def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
+                def url = sh(script: "aws cloudformation describe-stacks --stack-name ${env.STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`BaseUrlApi`].OutputValue' --output text", returnStdout: true).trim()
                 env.BASE_URL = url
-                echo "Stack URL: ${BASE_URL}"
+                echo "Stack URL: ${env.BASE_URL}"
             }
         }
     }
     stage('Test') {
         steps {
             script {
-                sh "export BASE_URL=${BASE_URL}"
+                sh "export BASE_URL=${env.BASE_URL}"
                 sh 'pytest --junitxml=result.rest.xml test/integration/todoApiTest.py'
             }
             junit 'result*.xml'
