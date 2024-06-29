@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Static Test') {
             steps {
-                // Ejecutar pruebas estáticas
+                // Ejecutar pruebas estáticas.
                 sh 'flake8 src/ > flake8-report.txt'
                 sh 'bandit -r src/ > bandit-report.txt'
                 // Archivar reportes de pruebas estáticas
