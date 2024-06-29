@@ -1,6 +1,7 @@
+// Obtener el nombre de la rama actual
 def branchName = env.BRANCH_NAME
 
-// Map branch names to specific Jenkinsfile names
+// Definir el nombre del Jenkinsfile específico basado en la rama
 def jenkinsFilePath = ""
 if (branchName == "develop") {
     jenkinsFilePath = "JenkinsfileStagingSeparado"
@@ -10,5 +11,11 @@ if (branchName == "develop") {
     error "No Jenkinsfile defined for branch ${branchName}"
 }
 
-// Load the Jenkinsfile for the specific branch
-load(jenkinsFilePath)
+// Verificar si el Jenkinsfile específico existe en el sistema de archivos
+def jenkinsFileExists = fileExists(jenkinsFilePath)
+if (!jenkinsFileExists) {
+    error "The specified Jenkinsfile (${jenkinsFilePath}) does not exist in branch ${branchName}"
+}
+
+// Cargar y ejecutar el Jenkinsfile específico de la rama
+load jenkinsFilePath
