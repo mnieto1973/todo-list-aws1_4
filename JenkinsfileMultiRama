@@ -1,5 +1,6 @@
 pipeline {
-    agent { label 'default' }
+     agent { label 'default' }
+
 
     stages {
         stage('Determine Branch Specific Jenkinsfile') {
@@ -11,9 +12,9 @@ pipeline {
                     // Definir el nombre del Jenkinsfile específico basado en la rama
                     def jenkinsFilePath = ""
                     if (branchName == "develop") {
-                        jenkinsFilePath = "JenkinsfileCdMulti"
+                        jenkinsFilePath = "JenkinsStagingMulti"
                     } else if (branchName == "master") {
-                        jenkinsFilePath = "JenkinsfileProductionSeparado"
+                        jenkinsFilePath = "JenkinsfileCdMulti"
                     } else {
                         error "No Jenkinsfile defined for branch ${branchName}"
                     }
@@ -27,10 +28,11 @@ pipeline {
                         error "The specified Jenkinsfile (${jenkinsFilePath}) does not exist in branch ${branchName}"
                     }
 
-                    // Cargar y ejecutar el Jenkinsfile específico de la rama
-                    def branchSpecificScript = load jenkinsFilePath
-                    echo "Loaded ${jenkinsFilePath}"
-                    branchSpecificScript.runPipeline()
+                   // Cargar el Jenkinsfile específico de la rama
+                    def branchSpecificPipeline = load jenkinsFilePath
+                    def stagesToRun = branchSpecificPipeline.runPipeline()
+
+                   
                 }
             }
         }
