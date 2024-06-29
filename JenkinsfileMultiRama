@@ -11,7 +11,7 @@ pipeline {
                     // Definir el nombre del Jenkinsfile específico basado en la rama
                     def jenkinsFilePath = ""
                     if (branchName == "develop") {
-                        jenkinsFilePath = "JenkinsfileCd"
+                        jenkinsFilePath = "JenkinsfileCdMulti"
                     } else if (branchName == "master") {
                         jenkinsFilePath = "JenkinsfileProductionSeparado"
                     } else {
