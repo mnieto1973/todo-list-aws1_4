@@ -1,0 +1,73 @@
+pipeline {
+    agent { label 'default' }
+
+    environment {
+        STACK_NAME = 'todo-list-aws-1-4-staging'
+        GIT_CREDENTIALS_ID = 'gitunir' // ID de las credenciales de Git configuradas en Jenkins
+        CONFIG_REPO_URL = 'https://raw.githubusercontent.com/mnieto1973/todo-list-aws1_4_config/staging/samconfig.toml'
+    }
+
+    stages {
+        stage('Get Code') {
+            steps {
+                // Clonar el repositorio principal en la rama 'develop'
+                git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
+                // Descargar el archivo de configuración samconfig.toml desde la rama 'staging'
+                sh 'curl -o samconfig-staging.toml ${CONFIG_REPO_URL}'
+            }
+        }
+        stage('Static Test') {
+            steps {
+                // Ejecutar pruebas estáticas
+                sh 'flake8 src/ > flake8-report.txt'
+                sh 'bandit -r src/ > bandit-report.txt'
+                // Archivar reportes de pruebas estáticas
+                archiveArtifacts artifacts: '**/*-report.txt', allowEmptyArchive: true
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // Construir y desplegar usando el archivo de configuración descargado
+                sh 'sam build'
+                sh 'sam deploy --config-env staging --config-file samconfig-staging.toml  --capabilities CAPABILITY_NAMED_IAM --no-fail-on-empty-changeset'
+            }
+        }
+        stage('Get Stack URL') {
+            steps {
+                script {
+                    def url = sh(script: "aws cloudformation describe-stacks --stack-name ${STACK_NAME} --query \"Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue\" --output text", returnStdout: true).trim()
+                    env.BASE_URL = url
+                    echo "Stack URL: ${BASE_URL}"
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    sh "export BASE_URL=${BASE_URL}"
+                    sh 'pytest --junitxml=result.rest.xml test/integration/todoApiTest.py'
+                }
+                junit 'result*.xml'
+            }
+        }
+        stage('Promote') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: env.GIT_CREDENTIALS_ID, usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh '''
+                        git config --global credential.helper store
+                        echo "https://${GIT_USERNAME}:${GIT_PASSWORD}@$(git config --get remote.origin.url | cut -d/ -f3-)" > ~/.git-credentials
+                        git checkout master
+                        git merge develop
+                        git push origin master
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        cleanup {
+            // Limpiar las credenciales guardadas en ~/.git-credentials.
+            sh 'rm -f ~/.git-credentials'
+        }
+    }
+}
