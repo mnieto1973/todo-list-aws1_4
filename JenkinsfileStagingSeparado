@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Get Code') {
             steps {
-                // Clonar el repositorio principal en la rama 'develop'
+                // Clonar el repositorio principal en la rama 'develop'.
                 git branch: 'develop', url: 'https://github.com/mnieto1973/todo-list-aws1_4.git'
                 // Descargar el archivo de configuración samconfig.toml desde la rama 'staging'
                 sh 'curl -o samconfig-staging.toml ${CONFIG_REPO_URL}'
